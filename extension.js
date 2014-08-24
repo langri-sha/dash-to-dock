@@ -29,6 +29,13 @@ function enable() {
     dock = new DockedDash.dockedDash(settings);
     intellihide = new Intellihide.intellihide(show, hide, dock, settings);
 
+    /* Pretend I'm the dash: meant to make appgrd swarm animation come from the
+     * right position of the appShowButton.
+     */
+    oldDash  = Main.overview._dash;
+    Main.overview._dash = dock.dash;
+    bindSettingsChanges();
+
 }
 
 function disable() {
@@ -41,3 +48,11 @@ function disable() {
     settings = null;
 }
 
+
+function bindSettingsChanges() {
+    // This settings change require a full reload.
+    settings.connect('changed::dock-placement', function(){
+        disable();
+        enable();
+    });
+}
