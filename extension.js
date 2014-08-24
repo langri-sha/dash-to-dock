@@ -38,6 +38,7 @@ function enable() {
      */
     oldDash  = Main.overview._dash;
     Main.overview._dash = dock.dash;
+    bindSettingsChanges();
 }
 
 function disable() {
@@ -52,3 +53,11 @@ function disable() {
     oldDash=null;
 }
 
+
+function bindSettingsChanges() {
+    // This settings change require a full reload.
+    settings.connect('changed::dock-placement', function(){
+        disable();
+        enable();
+    });
+}
