@@ -350,9 +350,17 @@ const dockedDash = new Lang.Class({
         // However tha same workaround doesn't work.
         Main.overview._controls._dashSlider.actor.hide();
 
-        // Dash spacer
-        Main.overview._controls._dashSpacer.destroy(); // TODO RESTORE on extension unload
+        // Also set dash width to 0, so it's not taken into account by code calculaing the reserved space in the overview
+        Main.overview._controls.dash.actor.set_width(0);
+
+        // Manage the DashSpacer which is used to reserve space in the overview for the dock
+        // Replace the current dashSpacer with a new one pointing at the dashtodock dash
+        // and positioned according to the dash positioning. It gets restored on extension unload.
+        Main.overview._controls._dashSpacer.destroy();
         this._dashSpacer = new OverviewControls.DashSpacer();
+        //Main.overview._controls._dashSpacer = this._dashSpacer;
+        this._dashSpacer.setDashActor(this._box);
+
         if (this._direction ==  Direction.LEFT) // TODO: CHECK WHAT HAPPENS IN rtl
           Main.overview._controls._group.insert_child_at_index(this._dashSpacer, 0); // insert on first (left)
         else if (this._direction ==  Direction.BOTTOM)
@@ -361,12 +369,6 @@ const dockedDash = new Lang.Class({
             Main.overview._controls._group.insert_child_at_index(this._dashSpacer, -1);
         else if (this._direction ==  Direction.TOP)
             Main.overview._overview.insert_child_at_index(this._dashSpacer, 0);
-
-        // so that i delete it when the extension is reloaded? tmp workaround, i should restore things on unload.
-        Main.overview._controls._dashSpacer = this._dashSpacer; // not sure it is the rbest idea
-
-        this._dashSpacer.setDashActor(this._box);
-        //Main.overview._controls._dashSpacer.setDashActor(this._box); //connect tp the box as that has the right full size (to check if actor wold actually work)
 
         // Add dash container actor and the container to the Chrome.
         this.actor.set_child(this._slider);
@@ -440,8 +442,15 @@ const dockedDash = new Lang.Class({
         // Remove existing barrier
         this._removeBarrier();
 
+        // Restore the default dashSpacer and link it to the standard dash
+        this._dashSpacer.destroy();
+        Main.overview._controls._dashSpacer = new OverviewControls.DashSpacer();
+        Main.overview._controls._group.insert_child_at_index(Main.overview._controls._dashSpacer, 0);
+        Main.overview._controls._dashSpacer.setDashActor(Main.overview._controls._dashSlider.actor);
+
         // Reshow normal dash previously hidden, restore panel position if changed.
         Main.overview._controls._dashSlider.actor.show();
+        Main.overview._controls.dash.actor.set_width(-1); //reset default dash size
         this._revertMainPanel();
     },
 
