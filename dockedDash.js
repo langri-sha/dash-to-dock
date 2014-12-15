@@ -14,6 +14,7 @@ const Main = imports.ui.main;
 const Dash = imports.ui.dash;
 const MessageTray = imports.ui.messageTray;
 const Overview = imports.ui.overview;
+const OverviewControls = imports.ui.overviewControls;
 const Tweener = imports.ui.tweener;
 const ViewSelector = imports.ui.viewSelector;
 const WorkspaceSwitcherPopup= imports.ui.workspaceSwitcherPopup;
@@ -348,6 +349,24 @@ const dockedDash = new Lang.Class({
         // I don't know if it's linked with this bug: https://bugzilla.gnome.org/show_bug.cgi?id=692744.
         // However tha same workaround doesn't work.
         Main.overview._controls._dashSlider.actor.hide();
+
+        // Dash spacer
+        Main.overview._controls._dashSpacer.destroy(); // TODO RESTORE on extension unload
+        this._dashSpacer = new OverviewControls.DashSpacer();
+        if (this._direction ==  Direction.LEFT) // TODO: CHECK WHAT HAPPENS IN rtl
+          Main.overview._controls._group.insert_child_at_index(this._dashSpacer, 0); // insert on first (left)
+        else if (this._direction ==  Direction.BOTTOM)
+          Main.overview._overview.insert_child_at_index(this._dashSpacer, -1); // insert on last (bottom)
+        else if (this._direction ==  Direction.RIGHT)
+            Main.overview._controls._group.insert_child_at_index(this._dashSpacer, -1);
+        else if (this._direction ==  Direction.TOP)
+            Main.overview._overview.insert_child_at_index(this._dashSpacer, 0);
+
+        // so that i delete it when the extension is reloaded? tmp workaround, i should restore things on unload.
+        Main.overview._controls._dashSpacer = this._dashSpacer; // not sure it is the rbest idea
+
+        this._dashSpacer.setDashActor(this._box);
+        //Main.overview._controls._dashSpacer.setDashActor(this._box); //connect tp the box as that has the right full size (to check if actor wold actually work)
 
         // Add dash container actor and the container to the Chrome.
         this.actor.set_child(this._slider);
