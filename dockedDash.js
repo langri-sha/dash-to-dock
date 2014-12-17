@@ -356,14 +356,14 @@ const dockedDash = new Lang.Class({
         //Main.overview._controls._dashSpacer = this._dashSpacer;
         this._dashSpacer.setDashActor(this._box);
 
-        if (this._direction ==  Direction.LEFT) // TODO: CHECK WHAT HAPPENS IN rtl
-          Main.overview._controls._group.insert_child_at_index(this._dashSpacer, this._rtl?-1:0); // insert on first or last (rtl)
-        else if (this._direction ==  Direction.BOTTOM)
-          Main.overview._overview.insert_child_at_index(this._dashSpacer, -1); // insert on last (bottom)
+        if (this._direction ==  Direction.LEFT)
+          Main.overview._controls._group.insert_child_at_index(this._dashSpacer, 0); // insert on first
         else if (this._direction ==  Direction.RIGHT)
-            Main.overview._controls._group.insert_child_at_index(this._dashSpacer, this._rtl?0:-1);
+            Main.overview._controls._group.insert_child_at_index(this._dashSpacer, -1); // insert on last
         else if (this._direction ==  Direction.TOP)
             Main.overview._overview.insert_child_at_index(this._dashSpacer, 0);
+        else if (this._direction ==  Direction.BOTTOM)
+          Main.overview._overview.insert_child_at_index(this._dashSpacer, -1);
 
         // Add dash container actor and the container to the Chrome.
         this.actor.set_child(this._slider);
