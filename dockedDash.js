@@ -319,7 +319,7 @@ const dockedDash = new Lang.Class({
         this.actor.connect('notify::allocation',
                                               Lang.bind(Main.layoutManager, Main.layoutManager._queueUpdateRegions));
 
-        this._slider.connect('allocation-changed', Lang.bind(this, this._updateStaticBox));
+        this.dash._container.connect('allocation-changed', Lang.bind(this, this._updateStaticBox));
 
         // sync hover after a popupmenu is closed
         this.dash.connect('menu-closed', Lang.bind(this, function(){this._box.sync_hover();}));
