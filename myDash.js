@@ -116,6 +116,79 @@ const myDashActor = new Lang.Class({
     }
 });
 
+const myDashItemContainer = new Lang.Class({
+    Name: 'dashToDockDashItemContainer',
+    Extends: Dash.DashItemContainer,
+
+    _init: function(settings) {
+      this._settings = settings;
+      this.parent();
+             log('****');
+    },
+
+    showLabel: function() {
+      if (!this._labelText) {
+        return;
+      }
+
+      this.label.set_text(this._labelText);
+      this.label.opacity = 0;
+      this.label.show();
+
+      let [stageX, stageY] = this.get_transformed_position();
+      let node = this.label.get_theme_node();
+
+      let itemWidth  = this.allocation.x2 - this.allocation.x1;
+      let itemHeight = this.allocation.y2 - this.allocation.y1;
+
+      
+      let labelWidth = this.label.get_width();
+      let labelHeight = this.label.get_height();
+
+      let x, y, xOffset, yOffset;
+
+      let direction = this._settings.get_enum('dock-placement');
+        this._isHorizontal = ( this._direction== Direction.TOP
+                           || this._direction== Direction.BOTTOM);
+      let labelOffset = node.get_length('-x-offset');
+
+      switch(direction) {
+        case Direction.LEFT:
+            yOffset = Math.floor((itemHeight - labelHeight) / 2)
+            y = stageY + yOffset;
+            xOffset = labelOffset;
+            x = stageX + this.get_width() + xOffset;
+            break;
+          break;  
+        case Direction.RIGHT:
+            yOffset = Math.floor((itemHeight - labelHeight) / 2)
+            y = stageY + yOffset;
+            xOffset = labelOffset;
+            x = Math.round(stageX) - labelWidth - xOffset;
+            break;
+        case Direction.TOP:
+            y = stageY + labelOffset + itemHeight;
+            xOffset = Math.floor((itemWidth - labelWidth) / 2);
+            x = stageX + xOffset;
+            break;
+        case Direction.BOTTOM:
+            yOffset = labelOffset;
+            y = stageY - labelHeight - yOffset;
+            xOffset = Math.floor((itemWidth - labelWidth) / 2);
+            x = stageX + xOffset;
+            break;
+      }
+
+      this.label.set_position(x, y);
+      Tweener.addTween(this.label, 
+        { opacity: 255,
+          time: DASH_ITEM_LABEL_SHOW_TIME,
+          transition: 'easeOutQuad',
+        });
+      }
+});
+
+
 /* This class is a fork of the upstream dash class (ui.dash.js)
  *
  * Summary of changes:
@@ -312,7 +385,7 @@ const myDash = new Lang.Class({
                             this._itemMenuStateChanged(item, opened);
                         }));
 
-        let item = new Dash.DashItemContainer();
+        let item = new myDashItemContainer(this._settings);
         item.setChild(appIcon.actor);
 
         // Override default AppIcon label_actor, now the
