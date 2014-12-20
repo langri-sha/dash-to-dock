@@ -188,6 +188,22 @@ const myDashItemContainer = new Lang.Class({
       }
 });
 
+/* Extend the ShowAppsIcon class:
+ *
+ * Control label position on the dash placement
+*/
+const myShowAppsIcon = new Lang.Class({
+    Name: 'dashToDockShowAppsIcon',
+    Extends: Dash.ShowAppsIcon,
+
+    _init: function(settings) {
+      this._settings = settings;
+      this.parent();
+    },
+
+    showLabel: myDashItemContainer.prototype.showLabel
+});
+
 
 /* This class is a fork of the upstream dash class (ui.dash.js)
  *
@@ -227,7 +243,7 @@ const myDash = new Lang.Class({
         this._box._delegate = this;
         this._container.add_actor(this._box);
 
-        this._showAppsIcon = new Dash.ShowAppsIcon();
+        this._showAppsIcon = new myShowAppsIcon(this._settings);
         this._showAppsIcon.childScale = 1;
         this._showAppsIcon.childOpacity = 255;
         this._showAppsIcon.icon.setIconSize(this.iconSize);
