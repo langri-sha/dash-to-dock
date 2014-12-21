@@ -33,6 +33,18 @@ const Direction = {
     BOTTOM: 3
 };
 
+/* Return the actual position reverseing left and right in rtl */
+function getPosition(settings) {
+    let direction = settings.get_enum('dock-placement');
+    if(Clutter.get_default_text_direction() == Clutter.TextDirection.RTL) {
+        if (direction == Direction.LEFT)
+            direction = Direction.RIGHT;
+        else if (direction == Direction.RIGHT)
+            direction = Direction.LEFT;
+    }
+    return direction;
+}
+
 /*
  * A simple Actor with one child whose allocation takes into account the
  * slide out of its child via the _slidex parameter ([0:1]).
@@ -183,7 +195,7 @@ const dockedDash = new Lang.Class({
         this._settings = settings;
         this._bindSettingsChanges();
 
-        this._direction = this._settings.get_enum('dock-placement');
+        this._direction = getPosition(settings);
         this._isHorizontal = ( this._direction== Direction.TOP
                            || this._direction== Direction.BOTTOM);
 
@@ -358,9 +370,9 @@ const dockedDash = new Lang.Class({
         this._dashSpacer.setDashActor(this._box);
 
         if (this._direction ==  Direction.LEFT)
-          Main.overview._controls._group.insert_child_at_index(this._dashSpacer, 0); // insert on first
+          Main.overview._controls._group.insert_child_at_index(this._dashSpacer, this._rtl?-1:0); // insert on first
         else if (this._direction ==  Direction.RIGHT)
-            Main.overview._controls._group.insert_child_at_index(this._dashSpacer, -1); // insert on last
+            Main.overview._controls._group.insert_child_at_index(this._dashSpacer, this._rtl?0:-1); // insert on last
         else if (this._direction ==  Direction.TOP)
             Main.overview._overview.insert_child_at_index(this._dashSpacer, 0);
         else if (this._direction ==  Direction.BOTTOM)
