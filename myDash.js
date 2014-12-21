@@ -33,6 +33,18 @@ const Direction = {
     BOTTOM: 3
 };
 
+/* Return the actual position reverseing left and right in rtl */
+function getPosition(settings) {
+    let direction = settings.get_enum('dock-placement');
+    if(Clutter.get_default_text_direction() == Clutter.TextDirection.RTL) {
+        if (direction == Direction.LEFT)
+            direction = Direction.RIGHT;
+        else if (direction == Direction.RIGHT)
+            direction = Direction.LEFT;
+    }
+    return direction;
+}
+
 /* This class is a fork of the upstream DashActor class (ui.dash.js)
  *
  * Summary of changes:
@@ -46,7 +58,7 @@ const myDashActor = new Lang.Class({
 
     _init: function(settings) {
         this._settings = settings;
-        this._direction = this._settings.get_enum('dock-placement');
+        this._direction = getPosition(this._settings);
         this._isHorizontal = ( this._direction== Direction.TOP
                            || this._direction== Direction.BOTTOM);
         let layout = new Clutter.BoxLayout({ orientation:
@@ -147,7 +159,7 @@ const myDashItemContainer = new Lang.Class({
 
       let x, y, xOffset, yOffset;
 
-      let direction = this._settings.get_enum('dock-placement');
+      let direction = getPosition(this._settings);
         this._isHorizontal = ( this._direction== Direction.TOP
                            || this._direction== Direction.BOTTOM);
       let labelOffset = node.get_length('-x-offset');
